@@ -1,0 +1,23 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/PLuginLoader.ts",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "semver": "^6.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.5",
+    "@types/semver": "^6.0.2"
+  }
+}
