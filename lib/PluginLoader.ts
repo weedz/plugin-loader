@@ -6,7 +6,14 @@ export interface PluginManifest {
     version: SemVer | string,
     dependencies: PluginDependencies,
     pluginPath?: string,
-    type?: string
+    type?: string | string[]
+}
+
+export type HandlerArgument = {
+    manifest: PluginManifest
+    path: string
+    api?: any
+    previous?: any
 }
 
 interface PluginDependencies {
@@ -20,7 +27,7 @@ async function getPluginManifest(pluginName: string, pluginPath: string) {
     const manifest = await import(`${pluginPath}/${pluginName}/plugin.json`);
     manifest.version = new SemVer(manifest.version);
     if (!validateManifest(manifest)) {
-        throw "Invalid manifest file";
+        throw new Error("Invalid manifest file");
     }
     return manifest;
 }
@@ -37,8 +44,8 @@ async function checkDependencies(manifest: PluginManifest, pluginPath: string, e
             dep = await getPluginManifest(dependency, pluginPath);
             enabledPlugins.set(dependency, dep);
         }
-        if (!satisfies(dep.version, manifest.dependencies[dependency])) {
-            throw new Error(`Dependency not met for ${dependency}: expected ${manifest.dependencies[dependency]}, got ${dep.version.toString()}`);
+        if (!satisfies(dep.version, manifest.dependencies[dependency].version)) {
+            throw new Error(`Dependency not met for ${dependency}: expected ${manifest.dependencies[dependency].version}, got ${dep.version.toString()}`);
         }
         if (dep.dependencies) {
             checkDependencies(dep, pluginPath, enabledPlugins);
@@ -81,12 +88,23 @@ export default async function Loader(pluginList: string[], pluginPath: string, o
     for (const plugin of enabledPlugins.values()) {
         options.log(`${chalk.cyan(plugin.name)} [${plugin.version.toString()}]`);
 
-        let handler = plugin.type && options.handlers[plugin.type]
-            ? options.handlers[plugin.type]
-            : options.handlers.default;
+        let handler: Function
+
+        if (Array.isArray(plugin.type)) {
+            handler = plugin.type.slice(1).reduce((acc, value) => {
+                if (!options.handlers[value]) {
+                    throw new Error(`Handler "${value}" not found`);
+                }
+                return options.handlers[value]({ previous: acc, manifest: plugin, path: pluginPath, api: options.api });
+            }, options.handlers[plugin.type[0]]({ manifest: plugin, path: pluginPath, api: options.api }));
+        } else {
+            handler = plugin.type && options.handlers[plugin.type]
+                ? options.handlers[plugin.type]
+                : options.handlers.default;
+        }
 
         const pluginObject = {
-            plugin: await handler(plugin, pluginPath, options.api),
+            plugin: await handler({ manifest: plugin, path: pluginPath, api: options.api }),
             manifest: plugin
         };
         plugins.set(plugin.name, pluginObject);
