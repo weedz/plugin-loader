@@ -24,7 +24,7 @@ interface PluginDependencies {
 }
 
 async function getPluginManifest(pluginName: string, pluginPath: string) {
-    const manifest = await import(`${pluginPath}/${pluginName}/plugin.json`);
+    const manifest: PluginManifest = await import(`${pluginPath}/${pluginName}/plugin.json`);
     manifest.version = new SemVer(manifest.version);
     if (!validateManifest(manifest)) {
         throw new Error("Invalid manifest file");

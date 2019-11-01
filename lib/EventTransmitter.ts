@@ -1,24 +1,26 @@
 class EventTransmitter{
-    listeners: {};
+    listeners: {
+        [type: string]: Function[]
+    };
 
     constructor() {
         this.listeners = {};
     }
 
-    subscribe(type, listener: Function) {
+    subscribe(type: string, listener: Function) {
         if (!this.listeners[type]) {
             this.listeners[type] = [];
         }
         this.listeners[type].push(listener);
-        return function() {
+        return () => {
             this.unsubscribe(type, listener);
         }
     }
-    unsubscribe(type, listener){
+    unsubscribe(type: string, listener: Function) {
         this.listeners[type] = this.listeners[type].filter(l => l !== listener);
     }
 
-    dispatchEvent(type, data) {
+    dispatchEvent(type: string, data: any) {
         if (!this.listeners[type]) {
             return false;
         }
