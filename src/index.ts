@@ -1,5 +1,6 @@
 import { SemVer, satisfies, Range } from "semver";
 import * as chalk from "chalk";
+export { NodeHandler } from "./Handlers/NodeHandler";
 
 export interface PluginManifest {
     name: string,
