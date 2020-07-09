@@ -1,5 +1,5 @@
 {
-  "name": "plugin-loader",
+  "name": "@weedzcokie/plugin-loader",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
