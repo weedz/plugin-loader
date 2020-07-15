@@ -1,7 +1,6 @@
 {
   "name": "@weedzcokie/plugin-loader",
-  "version": "1.0.2",
-  "description": "",
+  "version": "1.0.3",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "source": "src/index.ts",
@@ -24,5 +23,14 @@
     "@types/node": "^14.0.20",
     "@types/semver": "^7.3.1",
     "typescript": "^3.9.6"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weedz/plugin-loader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/weedz/plugin-loader/issues"
+  },
+  "homepage": "https://github.com/weedz/plugin-loader#readme",
+  "description": ""
 }
