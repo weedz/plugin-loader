@@ -1,6 +1,7 @@
 import { SemVer, satisfies, Range } from "semver";
 import * as chalk from "chalk";
 export { NodeHandler } from "./Handlers/NodeHandler";
+export { PluginBase } from "./Plugin";
 
 export interface PluginManifest {
     name: string
@@ -11,20 +12,27 @@ export interface PluginManifest {
     type?: string | string[]
 }
 
-export type HandlerArgument = {
+export type HandlerArgument<T> = {
     manifest: PluginManifest
     path: string
     api?: any
+    dependencies?: {[key: string]: T}
     previous?: any
 }
 
-type LoaderOptions = {
-    log: Function
+export type PluginObject<T> = {
+    plugin: T
+    manifest: PluginManifest
+    dependent: string[]
+}
+
+type LoaderOptions<API = any> = {
+    log: (msg: string) => void
     path: string
-    api?: any
+    api?: API
     handlers: {
-        default: Function
-        [type: string]: Function
+        default<T>(arg: HandlerArgument<T>): Promise<T>
+        [type: string]: <T>(arg: HandlerArgument<T>) => Promise<T>
     }
 }
 
@@ -65,35 +73,38 @@ async function checkDependencies(manifest: PluginManifest, pluginPath: string, e
     }
 }
 
-async function load(plugin: PluginManifest, options: LoaderOptions, availablePlugins: Map<string, PluginManifest>, plugins: Map<string, any>, dependent: string[] = [], depth = 0) {
+async function load<T>(plugin: PluginManifest, options: LoaderOptions, availablePlugins: Map<string, PluginManifest>, plugins: Map<string, PluginObject<T>>, dependent: string[] = [], depth = 0) {
+    const dependencies: {[key: string]: any} = {};
+
     for (const depName in plugin.dependencies) {
-        options.log(`${" ".repeat(depth + 1)}-> ${chalk.cyan(depName)} [${plugin.dependencies[depName].version}]`);
         const dep = availablePlugins.get(depName);
         if (!dep) {
             throw `Error loading dependency ${depName} of ${plugin.name}`;
         }
         if (!plugins.get(depName)) {
-            load(dep, options, availablePlugins, plugins, dependent.concat(plugin.name), depth + 1);
+            options.log(`${" ".repeat(depth + 1)}-> ${chalk.cyan(depName)} [${plugin.dependencies[depName].version}]`);
+            await load<T>(dep, options, availablePlugins, plugins, dependent.concat(plugin.name), depth + 1);
+
+            const loadedDependency = plugins.get(depName);
+            if (!loadedDependency) {
+                throw `Unknown error while loading dependency ${depName} of ${plugin.name}`;
+            }
+            dependencies[depName] = loadedDependency.plugin;
         }
     }
 
-    let handler: Function
+    let handler: <T>(arg: HandlerArgument<T>) => Promise<T>;
 
     if (Array.isArray(plugin.type)) {
-        handler = plugin.type.slice(1).reduce((acc, value) => {
-            if (!options.handlers[value]) {
-                throw new Error(`Handler "${value}" not found`);
-            }
-            return options.handlers[value]({ previous: acc, manifest: plugin, path: options.path, api: options.api });
-        }, options.handlers[plugin.type[0]]({ manifest: plugin, path: options.path, api: options.api }));
+        throw "'plugin.type' as Array not supported yet..";
     } else {
         handler = plugin.type && options.handlers[plugin.type]
             ? options.handlers[plugin.type]
             : options.handlers.default;
     }
 
-    const pluginObject = {
-        plugin: await handler({ manifest: plugin, path: options.path, api: options.api }),
+    const pluginObject: PluginObject<T> = {
+        plugin: await handler<T>({ manifest: plugin, path: options.path, api: options.api, dependencies }),
         manifest: plugin,
         dependent
     };
@@ -101,10 +112,7 @@ async function load(plugin: PluginManifest, options: LoaderOptions, availablePlu
     plugins.set(plugin.name, pluginObject);
 }
 
-export default async function Loader(pluginList: string[], options: LoaderOptions) {
-    if (!options.api) {
-        options.api = {};
-    }
+export default async function Loader<T, Api = unknown>(pluginList: string[], options: LoaderOptions<Api>) {
     const enabledPlugins = new Map<string, PluginManifest>();
     options.log(`Checking enabled plugins...`);
     for (const pluginName of pluginList) {
@@ -126,14 +134,14 @@ export default async function Loader(pluginList: string[], options: LoaderOption
     }
     options.log(`Loading plugins...`);
 
-    const plugins = new Map<string, any>();
+    const plugins = new Map<string, PluginObject<T>>();
 
     for (const pluginManifest of enabledPlugins.values()) {
         const loadedPlugin = plugins.get(pluginManifest.name);
         
         if (!loadedPlugin) {
             options.log(`${chalk.cyan(pluginManifest.name)} [${pluginManifest.version.toString()}]`);
-            await load(pluginManifest, options, enabledPlugins, plugins);
+            await load<T>(pluginManifest, options, enabledPlugins, plugins);
         } else {
             options.log(`${chalk.cyan(pluginManifest.name)} [${pluginManifest.version.toString()}], loaded by ${loadedPlugin.dependent}`);
         }

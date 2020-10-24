@@ -1,6 +1,6 @@
 {
   "name": "@weedzcokie/plugin-loader",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "source": "src/index.ts",
