@@ -65,14 +65,16 @@ async function checkDependencies(manifest: PluginManifest, pluginPath: string, e
     }
 }
 
-async function load(plugin: PluginManifest, options: LoaderOptions, availablePlugins: Map<string, PluginManifest>, plugins: Map<string, any>, dependent: string | null = null, depth = 0) {
+async function load(plugin: PluginManifest, options: LoaderOptions, availablePlugins: Map<string, PluginManifest>, plugins: Map<string, any>, dependent: string[] = [], depth = 0) {
     for (const depName in plugin.dependencies) {
         options.log(`${" ".repeat(depth + 1)}-> ${chalk.cyan(depName)} [${plugin.dependencies[depName].version}]`);
         const dep = availablePlugins.get(depName);
         if (!dep) {
             throw `Error loading dependency ${depName} of ${plugin.name}`;
         }
-        load(dep, options, availablePlugins, plugins, plugin.name, depth + 1);
+        if (!plugins.get(depName)) {
+            load(dep, options, availablePlugins, plugins, dependent.concat(plugin.name), depth + 1);
+        }
     }
 
     let handler: Function
