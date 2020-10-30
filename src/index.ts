@@ -26,13 +26,13 @@ export type PluginObject<T> = {
     dependent: string[]
 }
 
-type LoaderOptions<API = any> = {
+type LoaderOptions<T, API = any> = {
     log: (msg: string) => void
     path: string
     api?: API
     handlers: {
-        default<T>(arg: HandlerArgument<T>): Promise<T>
-        [type: string]: <T>(arg: HandlerArgument<T>) => Promise<T>
+        default(arg: HandlerArgument<T>): Promise<T>
+        [type: string]: (arg: HandlerArgument<T>) => Promise<T>
     }
 }
 
@@ -73,7 +73,7 @@ async function checkDependencies(manifest: PluginManifest, pluginPath: string, e
     }
 }
 
-async function load<T>(plugin: PluginManifest, options: LoaderOptions, availablePlugins: Map<string, PluginManifest>, plugins: Map<string, PluginObject<T>>, dependent: string[] = [], depth = 0) {
+async function load<T>(plugin: PluginManifest, options: LoaderOptions<T>, availablePlugins: Map<string, PluginManifest>, plugins: Map<string, PluginObject<T>>, dependent: string[] = [], depth = 0) {
     const dependencies: {[key: string]: any} = {};
 
     for (const depName in plugin.dependencies) {
@@ -93,7 +93,7 @@ async function load<T>(plugin: PluginManifest, options: LoaderOptions, available
         dependencies[depName] = plugins.get(depName);
     }
 
-    let handler: <T>(arg: HandlerArgument<T>) => Promise<T>;
+    let handler: (arg: HandlerArgument<T>) => Promise<T>;
 
     if (Array.isArray(plugin.type)) {
         throw "'plugin.type' as Array not supported yet..";
@@ -104,7 +104,7 @@ async function load<T>(plugin: PluginManifest, options: LoaderOptions, available
     }
 
     const pluginObject: PluginObject<T> = {
-        plugin: await handler<T>({ manifest: plugin, path: options.path, api: options.api, dependencies }),
+        plugin: await handler({ manifest: plugin, path: options.path, api: options.api, dependencies }),
         manifest: plugin,
         dependent
     };
@@ -112,7 +112,7 @@ async function load<T>(plugin: PluginManifest, options: LoaderOptions, available
     plugins.set(plugin.name, pluginObject);
 }
 
-export default async function Loader<T, Api = unknown>(pluginList: string[], options: LoaderOptions<Api>) {
+export default async function Loader<T, Api = unknown>(pluginList: string[], options: LoaderOptions<T, Api>) {
     const enabledPlugins = new Map<string, PluginManifest>();
     options.log(`Checking enabled plugins...`);
     for (const pluginName of pluginList) {

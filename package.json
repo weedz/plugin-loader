@@ -2,12 +2,11 @@
   "name": "@weedzcokie/plugin-loader",
   "version": "2.2.1",
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "source": "src/index.ts",
+  "source": "src",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "prepare": "npm run build"
+    "tsc": "tsc",
+    "prepublish": "npm run tsc"
   },
   "files": [
     "dist"
