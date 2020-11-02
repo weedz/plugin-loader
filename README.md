@@ -8,6 +8,8 @@ Define a base class and api for plugins:
 ```typescript
 // Plugin.ts
 import { PluginBase } from "@weedzcokie/plugin-loader";
+
+// this could be anything.
 export type PluginApi = {
     x: number
     y: number
@@ -31,7 +33,7 @@ export default abstract class Plugin extends PluginBase<PluginApi> {
 Load plugins:
 ```typescript
 // index.ts
-import Loader from "@weedzcokie/plugin-loader";
+import Loader, { PluginObject } from "@weedzcokie/plugin-loader";
 import Plugin from "./Plugin.ts":
 
 // not needed, just to show return type of `Loader`
@@ -42,9 +44,10 @@ Loader<Plugin>(config.plugins, {
         x: 1,
         y: 2,
     },
+
     // Path to where plugins are located
     path: path.resolve('./plugins'),
-    log: (str:string) => (Log(str, 'PluginLoader', 3)),
+    log: (msg: string) => console.log('[PluginLoader]', msg),
     handlers: {
         default: NodeHandler
     }
