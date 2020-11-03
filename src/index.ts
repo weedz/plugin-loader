@@ -90,7 +90,7 @@ async function load<T>(plugin: PluginManifest, options: LoaderOptions<T>, availa
                 throw `Unknown error while loading dependency ${depName} of ${plugin.name}`;
             }
         }
-        dependencies[depName] = plugins.get(depName);
+        dependencies[depName] = plugins.get(depName)?.plugin;
     }
 
     let handler: (arg: HandlerArgument<T>) => Promise<T>;
