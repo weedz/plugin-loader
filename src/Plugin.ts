@@ -1,11 +1,11 @@
-type Dependencies<Api> = {
-    [key: string]: PluginBase<Api>;
+type Dependencies<API> = {
+    [key: string]: PluginBase<API>;
 }
 
-export abstract class PluginBase<Api> {
-    protected api: Api;
-    protected dependencies: Dependencies<Api>;
-    constructor(api: Api, dependencies?: Dependencies<Api>) {
+export abstract class PluginBase<API> {
+    protected api: API;
+    protected dependencies: Dependencies<API>;
+    constructor(api: API, dependencies?: Dependencies<API>) {
         this.api = api;
         this.dependencies = dependencies || {};
     }
