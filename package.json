@@ -1,12 +1,13 @@
 {
   "name": "@weedzcokie/plugin-loader",
-  "version": "2.2.3",
+  "version": "2.3.0",
   "main": "dist/index.js",
   "source": "src",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "tsc": "rm -r dist; tsc",
-    "prepublish": "npm run tsc"
+    "build": "rm -r dist; tsc",
+    "dev": "tsc --watch",
+    "prepublish": "npm run build"
   },
   "files": [
     "dist"
