@@ -47,7 +47,7 @@ async function getPluginManifest(pluginName: string, pluginPath: string) {
     const manifest: PluginManifest = await import(`${pluginPath}/${pluginName}/plugin.json`);
     manifest.semver = new SemVer(manifest.version);
     if (!validateManifest(manifest)) {
-        throw new Error("Invalid manifest file");
+        throw "Invalid manifest file";
     }
     return manifest;
 }
@@ -61,11 +61,22 @@ async function checkDependencies(manifest: PluginManifest, pluginPath: string, e
     for (const dependency of Object.keys(manifest.dependencies)) {
         let dep = enabledPlugins.get(dependency);
         if (!dep) {
-            dep = await getPluginManifest(dependency, pluginPath);
-            enabledPlugins.set(dependency, dep);
+            try {
+                dep = await getPluginManifest(dependency, pluginPath);
+                if (!dep) {
+                    continue;
+                }
+                enabledPlugins.set(dependency, dep);
+            } catch (err) {
+                if (manifest.dependencies[dependency].optional) {
+                    continue;
+                } else {
+                    throw `Dependency '${dependency}' not found`;
+                }
+            }
         }
         if (!satisfies(dep.semver, manifest.dependencies[dependency].version)) {
-            throw new Error(`Dependency not met for ${dependency}: expected ${manifest.dependencies[dependency].version}, got ${dep.semver.toString()}`);
+            throw `Dependency not met for '${dependency}': expected ${manifest.dependencies[dependency].version}, got ${dep.semver.toString()}`;
         }
         if (dep.dependencies) {
             checkDependencies(dep, pluginPath, enabledPlugins);
@@ -79,7 +90,10 @@ async function load<T, API>(plugin: PluginManifest, options: LoaderOptions<T, AP
     for (const depName in plugin.dependencies) {
         const dep = availablePlugins.get(depName);
         if (!dep) {
-            throw `Error loading dependency ${depName} of ${plugin.name}`;
+            if (plugin.dependencies[depName].optional) {
+                continue;
+            }
+            throw `Error loading dependency '${depName}' of '${plugin.name}'`;
         }
         if (!plugins.get(depName)) {
             options.log(`${" ".repeat(depth + 1)}-> ${chalk.cyan(depName)} [${plugin.dependencies[depName].version}]`);
@@ -87,7 +101,7 @@ async function load<T, API>(plugin: PluginManifest, options: LoaderOptions<T, AP
 
             const loadedDependency = plugins.get(depName);
             if (!loadedDependency) {
-                throw `Unknown error while loading dependency ${depName} of ${plugin.name}`;
+                throw `Unknown error while loading dependency '${depName}' of '${plugin.name}'`;
             }
         }
         dependencies[depName] = plugins.get(depName)?.plugin;
@@ -123,7 +137,7 @@ export default async function Loader<T, API = unknown>(pluginList: string[], opt
             }
             enabledPlugins.set(pluginName, manifest);
         } catch (e) {
-            throw new Error(`Invalid manifest: ${pluginName}`);
+            throw new Error(`Invalid manifest: ${pluginName}. ${e}`);
         }
     }
     options.log(`Checking dependencies...`);
