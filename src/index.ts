@@ -72,10 +72,10 @@ class Loader<T, API = unknown> {
         this.options.log(`Checking dependencies...`);
         for (const manifest of this.availablePlugins.values()) {
             if (manifest.dependencies) {
-                await this.checkDependencies(manifest.dependencies, false);
+                await this.checkDependencies(manifest, manifest.dependencies, false);
             }
             if (manifest.optionalDependencies) {
-                await this.checkDependencies(manifest.optionalDependencies, true);
+                await this.checkDependencies(manifest, manifest.optionalDependencies, true);
             }
         }
 
@@ -94,31 +94,36 @@ class Loader<T, API = unknown> {
         return this.plugins;
     }
 
-    async checkDependencies(dependencies: PluginDependencies, optional: boolean) {
+    async checkDependencies(manifest: PluginManifest, dependencies: PluginDependencies, optional: boolean) {
         for (const dependency in dependencies) {
-            let dep = this.availablePlugins.get(dependency) || await this.checkDependency(dependency, optional);
+            let dep = this.availablePlugins.get(dependency) || await this.loadDependency(dependency, optional);
             if (!dep) {
                 continue;
             }
             if (!satisfies(dep.semver, dependencies[dependency])) {
+                this.availablePlugins.delete(dependency);
                 if (optional) {
-                    this.availablePlugins.delete(dependency);
-                    this.options.log(chalk.yellow`Optional dependency not met for '${dependency}': expected ${dependencies[dependency]}, got ${dep.semver.toString()}`);
+                    this.options.log(chalk.yellow`Optional dependency not met for '${manifest.name}': expected ${dependency}@${dependencies[dependency]}, got ${dep.semver.toString()}`);
                     continue;
                 } else {
                     throw `Dependency not met for '${dependency}': expected ${dependencies[dependency]}, got ${dep.semver.toString()}`;
                 }
             }
             if (dep.dependencies) {
-                await this.checkDependencies(dep.dependencies, false);
+                try {
+                    await this.checkDependencies(dep, dep.dependencies, false);
+                } catch (err) {
+                    this.availablePlugins.delete(dependency);
+                    throw err;
+                }
             }
             if (dep.optionalDependencies) {
-                await this.checkDependencies(dep.optionalDependencies, true);
+                await this.checkDependencies(dep, dep.optionalDependencies, true);
             }
         }
     }
 
-    async checkDependency(dependency: string, optional = false) {
+    async loadDependency(dependency: string, optional = false) {
         try {
             const dep = await this.getPluginManifest(dependency);
             this.availablePlugins.set(dependency, dep);
