@@ -1,4 +1,4 @@
-import { SemVer, satisfies, Range } from "semver";
+import { SemVer, satisfies, Range, parse } from "semver";
 import * as chalk from "chalk";
 export { NodeHandler } from "./Handlers/NodeHandler";
 export { PluginBase } from "./Plugin";
@@ -58,15 +58,11 @@ class Loader<T, API = unknown> {
     async loadPlugins(pluginList: string[]) {
         this.options.log(`Checking enabled plugins...`);
         for (const pluginName of pluginList) {
-            try {
-                const manifest = await this.getPluginManifest(pluginName);
-                if (manifest.name !== pluginName) {
-                    manifest.pluginPath = pluginName;
-                }
-                this.availablePlugins.set(pluginName, manifest);
-            } catch (e) {
-                throw new Error(`Invalid manifest: ${pluginName}. ${e}`);
+            const manifest = await this.getPluginManifest(pluginName);
+            if (manifest.name !== pluginName) {
+                manifest.pluginPath = pluginName;
             }
+            this.availablePlugins.set(pluginName, manifest);
         }
 
         this.options.log(`Checking dependencies...`);
@@ -140,10 +136,12 @@ class Loader<T, API = unknown> {
 
     async getPluginManifest(pluginName: string) {
         const manifest: PluginManifest = await import(`${this.options.path}/${pluginName}/plugin.json`);
-        manifest.semver = new SemVer(manifest.version);
-        if (!validateManifest(manifest)) {
-            throw "Invalid manifest file";
+        try {
+            validateManifest(manifest);
+        } catch (err) {
+            throw `Failed in plugin '${pluginName}': ${err}`;
         }
+        manifest.semver = new SemVer(manifest.version);
         if (!manifest.dependencies) {
             manifest.dependencies = {};
         }
@@ -198,6 +196,19 @@ class Loader<T, API = unknown> {
 
 // TODO: validate manifest file
 function validateManifest(manifest: PluginManifest) {
+    const errors: string[] = [];
+    if (!manifest.name) {
+        errors.push("missing 'name'");
+    }
+    if (!manifest.version) {
+        errors.push("missing 'version'");
+    } else if (!parse(manifest.version)) {
+        errors.push(`malformed version '${manifest.version}'. Make sure the version field is a valid SemVer string.`)
+    }
+
+    if (errors.length) {
+        throw chalk.red`Invalid fields in manifest:\n${errors.join("\n")}`;
+    }
     return true;
 }
 
