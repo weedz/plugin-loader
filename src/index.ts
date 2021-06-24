@@ -1,4 +1,4 @@
-import { Range } from "semver";
+import type { Range } from "semver";
 import chalk from "chalk";
 export { NodeHandler } from "./Handlers/NodeHandler";
 export { PluginBase } from "./Plugin";
