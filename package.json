@@ -1,8 +1,8 @@
 {
   "name": "@weedzcokie/plugin-loader",
-  "version": "3.0.0-alpha.2",
+  "version": "3.0.0",
   "main": "dist/index.js",
-  "source": "src",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -r dist; tsc",
@@ -10,7 +10,7 @@
     "prepublish": "npm run build"
   },
   "files": [
-    "dist"
+    "dist/"
   ],
   "keywords": [],
   "author": "Linus Björklund",

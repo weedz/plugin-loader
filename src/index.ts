@@ -1,12 +1,16 @@
-import { SemVer, satisfies, Range, parse } from "semver";
-import * as chalk from "chalk";
+import { Range } from "semver";
+import chalk from "chalk";
 export { NodeHandler } from "./Handlers/NodeHandler";
 export { PluginBase } from "./Plugin";
+
+import semver from "semver";
+
+const { satisfies, parse } = semver;
 
 export interface PluginManifest {
     name: string
     version: string
-    semver: SemVer
+    semver: semver.SemVer
     dependencies: PluginDependencies
     optionalDependencies: PluginDependencies
     pluginPath?: string
@@ -135,13 +139,13 @@ class Loader<T, API = unknown> {
     }
 
     async getPluginManifest(pluginName: string) {
-        const manifest: PluginManifest = await import(`${this.options.path}/${pluginName}/plugin.json`);
+        const manifest: PluginManifest = (await import(`${this.options.path}/${pluginName}/plugin.json`)).default;
         try {
             validateManifest(manifest);
         } catch (err) {
             throw `Failed in plugin '${pluginName}': ${err}`;
         }
-        manifest.semver = new SemVer(manifest.version);
+        manifest.semver = new semver.SemVer(manifest.version);
         if (!manifest.dependencies) {
             manifest.dependencies = {};
         }
