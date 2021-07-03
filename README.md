@@ -4,7 +4,7 @@
 
 ## Usage
 
-Define a base class and api for plugins:
+### Define a base class and api for plugins:
 ```typescript
 // Plugin.ts
 import { PluginBase } from "@weedzcokie/plugin-loader";
@@ -30,16 +30,47 @@ export default abstract class Plugin extends PluginBase<PluginApi> {
 }
 ```
 
-Load plugins:
+### Plugin manifest
+```json
+{
+    "name": "test-plugin",
+    "version": "1.0.0"
+}
+```
+`version` must be a semver compatible version string.
+
+And with dependencies, similar to how `package.json` defines dependencies:
+```json
+{
+    "name": "plugin-2",
+    "version": "1.0.0",
+    "dependencies": {
+        "test-plugin": "^1.0.0"
+    }
+}
+```
+
+### Load plugins:
+
+Assuming the following directory tree:
+```
+├─ plugins
+│  ├─ test-plugin
+│  │  ├── index.ts
+│  │  └── plugin.json
+│  └─ plugin-2
+│     ├── index.ts
+│     └── plugin.json
+├─ index.ts
+└─ Plugin.ts
+```
+
 ```typescript
 // index.ts
 import Loader, { PluginObject } from "@weedzcokie/plugin-loader";
-import Plugin from "./Plugin.ts":
+import Plugin, { PluginApi } from "./Plugin.ts":
 
-// not needed, just to show return type of `Loader`
-const loadedPlugins: Map<string, PluginObject<Plugin>> = new Map();
-
-Loader<Plugin>(config.plugins, {
+const plugins = await Loader<Plugin, PluginApi>(["test-plugin"], {
     api: {
         x: 1,
         y: 2,
@@ -51,7 +82,5 @@ Loader<Plugin>(config.plugins, {
     handlers: {
         default: NodeHandler
     }
-}).then(plugins => {
-    loadedPlugins = plugins;
 });
 ```
