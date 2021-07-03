@@ -2,29 +2,29 @@ lockfileVersion: 5.3
 
 specifiers:
   '@rollup/plugin-typescript': ^8.2.1
-  '@types/node': ^15.12.5
+  '@types/node': ^16.0.0
   '@types/semver': ^7.3.6
   chalk: ^4.1.1
-  rollup: ^2.52.3
+  rollup: ^2.52.7
   semver: ^7.3.5
   tslib: ^2.3.0
-  typescript: ^4.3.4
+  typescript: ^4.3.5
 
 dependencies:
   chalk: 4.1.1
   semver: 7.3.5
 
 devDependencies:
-  '@rollup/plugin-typescript': 8.2.1_f98a8762ffe7e6cea3574877623d19a6
-  '@types/node': 15.12.5
+  '@rollup/plugin-typescript': 8.2.1_ec8281ca6b723d6f50ac48788d981683
+  '@types/node': 16.0.0
   '@types/semver': 7.3.6
-  rollup: 2.52.3
+  rollup: 2.52.7
   tslib: 2.3.0
-  typescript: 4.3.4
+  typescript: 4.3.5
 
 packages:
 
-  /@rollup/plugin-typescript/8.2.1_f98a8762ffe7e6cea3574877623d19a6:
+  /@rollup/plugin-typescript/8.2.1_ec8281ca6b723d6f50ac48788d981683:
     resolution: {integrity: sha512-Qd2E1pleDR4bwyFxqbjt4eJf+wB0UKVMLc7/BAFDGVdAXQMCsD4DUv5/7/ww47BZCYxWtJqe1Lo0KVNswBJlRw==}
     engines: {node: '>=8.0.0'}
     peerDependencies:
@@ -32,14 +32,14 @@ packages:
       tslib: '*'
       typescript: '>=3.7.0'
     dependencies:
-      '@rollup/pluginutils': 3.1.0_rollup@2.52.3
+      '@rollup/pluginutils': 3.1.0_rollup@2.52.7
       resolve: 1.20.0
-      rollup: 2.52.3
+      rollup: 2.52.7
       tslib: 2.3.0
-      typescript: 4.3.4
+      typescript: 4.3.5
     dev: true
 
-  /@rollup/pluginutils/3.1.0_rollup@2.52.3:
+  /@rollup/pluginutils/3.1.0_rollup@2.52.7:
     resolution: {integrity: sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==}
     engines: {node: '>= 8.0.0'}
     peerDependencies:
@@ -48,15 +48,15 @@ packages:
       '@types/estree': 0.0.39
       estree-walker: 1.0.1
       picomatch: 2.3.0
-      rollup: 2.52.3
+      rollup: 2.52.7
     dev: true
 
   /@types/estree/0.0.39:
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
     dev: true
 
-  /@types/node/15.12.5:
-    resolution: {integrity: sha512-se3yX7UHv5Bscf8f1ERKvQOD6sTyycH3hdaoozvaLxgUiY5lIGEeH37AD0G0Qi9kPqihPn0HOfd2yaIEN9VwEg==}
+  /@types/node/16.0.0:
+    resolution: {integrity: sha512-TmCW5HoZ2o2/z2EYi109jLqIaPIi9y/lc2LmDCWzuCi35bcaQ+OtUh6nwBiFK7SOu25FAU5+YKdqFZUwtqGSdg==}
     dev: true
 
   /@types/semver/7.3.6:
@@ -145,8 +145,8 @@ packages:
       path-parse: 1.0.7
     dev: true
 
-  /rollup/2.52.3:
-    resolution: {integrity: sha512-QF3Sju8Kl2z0osI4unyOLyUudyhOMK6G0AeqJWgfiyigqLAlnNrfBcDWDx+f1cqn+JU2iIYVkDrgQ6/KtwEfrg==}
+  /rollup/2.52.7:
+    resolution: {integrity: sha512-55cSH4CCU6MaPr9TAOyrIC+7qFCHscL7tkNsm1MBfIJRRqRbCEY0mmeFn4Wg8FKsHtEH8r389Fz38r/o+kgXLg==}
     engines: {node: '>=10.0.0'}
     hasBin: true
     optionalDependencies:
@@ -172,8 +172,8 @@ packages:
     resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
     dev: true
 
-  /typescript/4.3.4:
-    resolution: {integrity: sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==}
+  /typescript/4.3.5:
+    resolution: {integrity: sha512-DqQgihaQ9cUrskJo9kIyW/+g0Vxsk8cDtZ52a3NGh0YNTfpUSArXSohyUGnvbPazEPLu398C0UxmKSOrPumUzA==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true

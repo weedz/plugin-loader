@@ -139,7 +139,8 @@ class Loader<T, API = unknown> {
     }
 
     async getPluginManifest(pluginName: string) {
-        const manifest: PluginManifest = (await import(`${this.options.path}/${pluginName}/plugin.json`)).default;
+        const pluginsPath = this.options.path;
+        const manifest: PluginManifest = (await import(`${pluginsPath}/${pluginName}/plugin.json`)).default;
         try {
             validateManifest(manifest);
         } catch (err) {
