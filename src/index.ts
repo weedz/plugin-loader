@@ -98,6 +98,11 @@ class Loader<T, API = unknown> {
         for (const dependency in dependencies) {
             let dep = this.availablePlugins.get(dependency) || await this.loadDependency(dependency, optional);
             if (!dep) {
+                if (optional) {
+                    this.options.log(`${chalk.cyan(manifest.name)}: ${chalk.yellow`Missing optional dependency '${dependency}'`}`);
+                } else {
+                    throw `${manifest.name}: Dependency '${dependency}' not found]`;
+                }
                 continue;
             }
             if (!satisfies(dep.semver, dependencies[dependency])) {
@@ -106,7 +111,7 @@ class Loader<T, API = unknown> {
                     this.options.log(chalk.yellow`Optional dependency not met for '${manifest.name}': expected ${dependency}@${dependencies[dependency]}, got ${dep.semver.toString()}`);
                     continue;
                 } else {
-                    throw `Dependency not met for '${dependency}': expected ${dependencies[dependency]}, got ${dep.semver.toString()}`;
+                    throw `${manifest.name}: Dependency not met for '${dependency}': expected ${dependencies[dependency]}, got ${dep.semver.toString()}`;
                 }
             }
             if (dep.dependencies) {
@@ -129,12 +134,7 @@ class Loader<T, API = unknown> {
             this.availablePlugins.set(dependency, dep);
             return dep;
         } catch (err) {
-            if (optional) {
-                this.options.log(chalk.yellow`Missing optional dependency '${dependency}'`);
-                return;
-            } else {
-                throw `Dependency '${dependency}' not found`;
-            }
+            return false;
         }
     }
 
