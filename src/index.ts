@@ -1,7 +1,8 @@
 import type { Range } from "semver";
 import chalk from "chalk";
 export { NodeHandler } from "./Handlers/NodeHandler";
-export { PluginBase } from "./Plugin";
+import { PluginBase } from "./Plugin";
+export { PluginBase };
 
 import semver from "semver";
 
@@ -17,7 +18,7 @@ export interface PluginManifest {
     type?: string | string[]
 }
 
-export type HandlerArgument<T, API = unknown> = {
+export type HandlerArgument<T extends PluginBase<API>, API = unknown> = {
     manifest: PluginManifest
     path: string
     api?: API
@@ -25,13 +26,13 @@ export type HandlerArgument<T, API = unknown> = {
     previous?: any
 }
 
-export type PluginObject<T> = {
+export type PluginObject<T extends PluginBase> = {
     plugin: T
     manifest: PluginManifest
     dependent: string[]
 }
 
-type LoaderOptions<T, API> = {
+type LoaderOptions<T extends PluginBase<API>, API> = {
     log: (msg: string) => void
     path: string
     api?: API
@@ -41,8 +42,8 @@ type LoaderOptions<T, API> = {
     }
 }
 
-type Plugins<T> = {
-    [name: string]: PluginObject<T>
+interface Plugins<T extends PluginBase> {
+    [pluginName: string]: PluginObject<T>
 }
 
 interface PluginDependencies {
@@ -50,7 +51,7 @@ interface PluginDependencies {
 }
 
 
-class Loader<T, API = unknown> {
+class Loader<T extends PluginBase<API>, API = unknown> {
     private plugins: Plugins<T> = {};
     private availablePlugins = new Map<string, PluginManifest>();
     options: LoaderOptions<T, API>
@@ -217,7 +218,7 @@ function validateManifest(manifest: PluginManifest) {
     return true;
 }
 
-export default function PluginLoader<T, API = unknown>(pluginList: string[], options: LoaderOptions<T, API>) {
+export default function PluginLoader<T extends PluginBase<API, unknown>, API = unknown>(pluginList: string[], options: LoaderOptions<T, API>) {
     const loader = new Loader<T, API>(options);
     return loader.loadPlugins(pluginList);
 }

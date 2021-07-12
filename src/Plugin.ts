@@ -1,12 +1,7 @@
-type Dependencies<API> = {
-    [key: string]: PluginBase<API>;
+interface Dependencies<API> {
+    [dependency: string]: PluginBase<API>
 }
 
-export abstract class PluginBase<API, D = Dependencies<API>> {
-    protected api: API;
-    protected dependencies: D;
-    constructor(api: API, dependencies: D) {
-        this.api = api;
-        this.dependencies = dependencies;
-    }
+export abstract class PluginBase<API = unknown, D = unknown | Dependencies<API>> {
+    constructor(protected api: API, protected dependencies: D) {}
 }
