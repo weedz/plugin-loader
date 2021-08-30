@@ -30,7 +30,7 @@ export default abstract class Plugin extends PluginBase<PluginApi> {
 }
 ```
 
-### Plugin manifest
+### Plugin manifest (plugin.json)
 ```json
 {
     "name": "test-plugin",
