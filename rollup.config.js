@@ -2,7 +2,10 @@ import typescript from "@rollup/plugin-typescript";
 import { defineConfig } from "rollup";
 
 export default defineConfig({
-    external: ["chalk", "semver"],
+    external: [
+        "kleur",
+        "semver/classes/semver","semver/functions/parse","semver/functions/satisfies"
+    ],
     input: "src/index.ts",
     output: [
         {

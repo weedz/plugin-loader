@@ -67,7 +67,7 @@ Assuming the following directory tree:
 
 ```typescript
 // index.ts
-import Loader, { PluginObject } from "@weedzcokie/plugin-loader";
+import Loader, { NodeHandler } from "@weedzcokie/plugin-loader";
 import Plugin, { PluginApi } from "./Plugin.ts":
 
 const plugins = await Loader<Plugin, PluginApi>(["test-plugin"], {

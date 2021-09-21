@@ -1,17 +1,17 @@
-import type { Range } from "semver";
-import chalk from "chalk";
+import SemVer from "semver/classes/semver";
+import Range from "semver/classes/range";
+import parse from "semver/functions/parse";
+import satisfies from "semver/functions/satisfies";
+import kleur from "kleur";
 export { NodeHandler } from "./Handlers/NodeHandler";
+
 import { PluginBase } from "./Plugin";
 export { PluginBase };
-
-import semver from "semver";
-
-const { satisfies, parse } = semver;
 
 export interface PluginManifest {
     name: string
     version: string
-    semver: semver.SemVer
+    semver: SemVer
     dependencies: PluginDependencies
     optionalDependencies: PluginDependencies
     pluginPath?: string
@@ -85,13 +85,13 @@ class Loader<T extends PluginBase<API>, API = unknown> {
             const loadedPlugin = this.plugins[pluginManifest.name];
 
             if (!loadedPlugin) {
-                this.options.log(`${chalk.cyan(pluginManifest.name)} [${pluginManifest.version.toString()}]`);
+                this.options.log(`${kleur.cyan(pluginManifest.name)} [${pluginManifest.version.toString()}]`);
                 await this.load(pluginManifest);
             } else {
-                this.options.log(`${chalk.cyan(pluginManifest.name)} [${pluginManifest.version.toString()}], loaded by ${loadedPlugin.dependent}`);
+                this.options.log(`${kleur.cyan(pluginManifest.name)} [${pluginManifest.version.toString()}], loaded by ${loadedPlugin.dependent}`);
             }
         }
-        this.options.log(`${chalk.green("Done!")}`);
+        this.options.log(`${kleur.green("Done!")}`);
         return this.plugins;
     }
 
@@ -100,7 +100,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
             let dep = this.availablePlugins.get(dependency) || await this.loadDependency(dependency, optional);
             if (!dep) {
                 if (optional) {
-                    this.options.log(`${chalk.cyan(manifest.name)}: ${chalk.yellow`Missing optional dependency '${dependency}'`}`);
+                    this.options.log(`${kleur.cyan(manifest.name)}: ${kleur.yellow(`Missing optional dependency '${dependency}'`)}`);
                 } else {
                     throw `${manifest.name}: Dependency '${dependency}' not found]`;
                 }
@@ -109,7 +109,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
             if (!satisfies(dep.semver, dependencies[dependency])) {
                 this.availablePlugins.delete(dependency);
                 if (optional) {
-                    this.options.log(chalk.yellow`Optional dependency not met for '${manifest.name}': expected ${dependency}@${dependencies[dependency]}, got ${dep.semver.toString()}`);
+                    this.options.log(kleur.yellow(`Optional dependency not met for '${manifest.name}': expected ${dependency}@${dependencies[dependency]}, got ${dep.semver.toString()}`));
                     continue;
                 } else {
                     throw `${manifest.name}: Dependency not met for '${dependency}': expected ${dependencies[dependency]}, got ${dep.semver.toString()}`;
@@ -147,7 +147,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
         } catch (err) {
             throw `Failed in plugin '${pluginName}': ${err}`;
         }
-        manifest.semver = new semver.SemVer(manifest.version);
+        manifest.semver = new SemVer(manifest.version);
         if (!manifest.dependencies) {
             manifest.dependencies = {};
         }
@@ -168,7 +168,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
                     continue;
                 }
 
-                this.options.log(`${" ".repeat(depth + 1)}-> ${chalk.cyan(depName)} [${plugin.dependencies[depName]}]`);
+                this.options.log(`${" ".repeat(depth + 1)}-> ${kleur.cyan(depName)} [${plugin.dependencies[depName]}]`);
 
                 await this.load(dep, dependent.concat(plugin.name), depth + 1);
 
@@ -213,7 +213,7 @@ function validateManifest(manifest: PluginManifest) {
     }
 
     if (errors.length) {
-        throw chalk.red`Invalid fields in manifest:\n${errors.join("\n")}`;
+        throw kleur.red(`Invalid fields in manifest:\n${errors.join("\n")}`);
     }
     return true;
 }
