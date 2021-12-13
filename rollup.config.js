@@ -3,7 +3,7 @@ import { defineConfig } from "rollup";
 
 export default defineConfig({
     external: [
-        "kleur",
+        "picocolors",
         "semver/classes/semver","semver/functions/parse","semver/functions/satisfies"
     ],
     input: "src/index.ts",
