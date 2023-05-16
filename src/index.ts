@@ -138,7 +138,9 @@ class Loader<T extends PluginBase<API>, API = unknown> {
 
     async getPluginManifest(pluginName: string) {
         const pluginsPath = this.options.path;
-        const manifest: PluginManifest = (await import(`${pluginsPath}/${pluginName}/plugin.json`)).default;
+        const manifest: PluginManifest = (await import(`${pluginsPath}/${pluginName}/plugin.json`, {
+            assert: { type: 'json' }
+        })).default;
         try {
             validateManifest(manifest);
         } catch (err) {
