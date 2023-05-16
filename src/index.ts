@@ -1,7 +1,4 @@
-import SemVer from "semver/classes/semver";
-import Range from "semver/classes/range";
-import parse from "semver/functions/parse";
-import satisfies from "semver/functions/satisfies";
+import { Range as SemVerRange, SemVer, satisfies, parse } from "semver";
 import pc from "picocolors";
 export { NodeHandler } from "./Handlers/NodeHandler";
 
@@ -47,7 +44,7 @@ interface Plugins<T extends PluginBase> {
 }
 
 interface PluginDependencies {
-    [pluginName: string]: Range | string
+    [pluginName: string]: SemVerRange | string
 }
 
 
