@@ -3,7 +3,7 @@ import { defineConfig } from "rollup";
 
 export default defineConfig({
     external: [
-        "picocolors",
+        "colorette",
         "semver",
     ],
     input: "src/index.ts",

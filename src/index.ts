@@ -1,5 +1,6 @@
-import { Range as SemVerRange, SemVer, satisfies, parse } from "semver";
-import pc from "picocolors";
+import { cyan, green, red, yellow } from "colorette";
+import { SemVer, Range as SemVerRange, parse, satisfies } from "semver";
+
 export { NodeHandler } from "./Handlers/NodeHandler";
 
 import { PluginBase } from "./Plugin";
@@ -82,13 +83,13 @@ class Loader<T extends PluginBase<API>, API = unknown> {
             const loadedPlugin = this.plugins[pluginManifest.name];
 
             if (!loadedPlugin) {
-                this.options.log(`${pc.cyan(pluginManifest.name)} [${pluginManifest.version.toString()}]`);
+                this.options.log(`${cyan(pluginManifest.name)} [${pluginManifest.version.toString()}]`);
                 await this.load(pluginManifest);
             } else {
-                this.options.log(`${pc.cyan(pluginManifest.name)} [${pluginManifest.version.toString()}], loaded by ${loadedPlugin.dependent}`);
+                this.options.log(`${cyan(pluginManifest.name)} [${pluginManifest.version.toString()}], loaded by ${loadedPlugin.dependent}`);
             }
         }
-        this.options.log(`${pc.green("Done!")}`);
+        this.options.log(`${green("Done!")}`);
         return this.plugins;
     }
 
@@ -97,7 +98,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
             let dep = this.availablePlugins.get(dependency) || await this.loadDependency(dependency, optional);
             if (!dep) {
                 if (optional) {
-                    this.options.log(`${pc.cyan(manifest.name)}: ${pc.yellow(`Missing optional dependency '${dependency}'`)}`);
+                    this.options.log(`${cyan(manifest.name)}: ${yellow(`Missing optional dependency '${dependency}'`)}`);
                 } else {
                     throw `${manifest.name}: Dependency '${dependency}' not found]`;
                 }
@@ -106,7 +107,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
             if (!satisfies(dep.semver, dependencies[dependency])) {
                 this.availablePlugins.delete(dependency);
                 if (optional) {
-                    this.options.log(pc.yellow(`Optional dependency not met for '${manifest.name}': expected ${dependency}@${dependencies[dependency]}, got ${dep.semver.toString()}`));
+                    this.options.log(yellow(`Optional dependency not met for '${manifest.name}': expected ${dependency}@${dependencies[dependency]}, got ${dep.semver.toString()}`));
                     continue;
                 } else {
                     throw `${manifest.name}: Dependency not met for '${dependency}': expected ${dependencies[dependency]}, got ${dep.semver.toString()}`;
@@ -167,7 +168,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
                     continue;
                 }
 
-                this.options.log(`${" ".repeat(depth + 1)}-> ${pc.cyan(depName)} [${plugin.dependencies[depName]}]`);
+                this.options.log(`${" ".repeat(depth + 1)}-> ${cyan(depName)} [${plugin.dependencies[depName]}]`);
 
                 await this.load(dep, dependent.concat(plugin.name), depth + 1);
 
@@ -212,7 +213,7 @@ function validateManifest(manifest: PluginManifest) {
     }
 
     if (errors.length) {
-        throw pc.red(`Invalid fields in manifest:\n${errors.join("\n")}`);
+        throw red(`Invalid fields in manifest:\n${errors.join("\n")}`);
     }
     return true;
 }
