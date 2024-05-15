@@ -1,44 +1,44 @@
 {
-  "name": "@weedzcokie/plugin-loader",
-  "version": "3.0.16",
-  "type": "module",
-  "main": "dist/index.js",
-  "exports": {
-    "types": "./dist/index.d.ts",
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
-  },
-  "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "lint": "tsc --noEmit",
-    "prepublish": "pnpm run build"
-  },
-  "files": [
-    "dist/"
-  ],
-  "keywords": [],
-  "author": "Linus Björklund",
-  "license": "MIT",
-  "dependencies": {
-    "colorette": "^2.0.20",
-    "semver": "^7.6.2"
-  },
-  "devDependencies": {
-    "@rollup/plugin-typescript": "^11.1.6",
-    "@types/node": "^20.12.12",
-    "@types/semver": "^7.5.8",
-    "rollup": "^4.17.2",
-    "tslib": "^2.6.2",
-    "typescript": "^5.4.5"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/weedz/plugin-loader.git"
-  },
-  "bugs": {
-    "url": "https://github.com/weedz/plugin-loader/issues"
-  },
-  "homepage": "https://github.com/weedz/plugin-loader#readme",
-  "description": ""
+    "name": "@weedzcokie/plugin-loader",
+    "version": "3.0.17",
+    "type": "module",
+    "main": "dist/index.js",
+    "exports": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+    },
+    "scripts": {
+        "build": "rollup -c",
+        "dev": "rollup -c -w",
+        "lint": "tsc --noEmit",
+        "prepublish": "pnpm run build"
+    },
+    "files": [
+        "dist/"
+    ],
+    "keywords": [],
+    "author": "Linus Björklund",
+    "license": "MIT",
+    "dependencies": {
+        "colorette": "^2.0.20",
+        "semver": "^7.6.2"
+    },
+    "devDependencies": {
+        "@rollup/plugin-typescript": "^11.1.6",
+        "@types/node": "^20.12.12",
+        "@types/semver": "^7.5.8",
+        "rollup": "^4.17.2",
+        "tslib": "^2.6.2",
+        "typescript": "^5.4.5"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/weedz/plugin-loader.git"
+    },
+    "bugs": {
+        "url": "https://github.com/weedz/plugin-loader/issues"
+    },
+    "homepage": "https://github.com/weedz/plugin-loader#readme",
+    "description": ""
 }
