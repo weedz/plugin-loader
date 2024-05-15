@@ -22,13 +22,13 @@
   "license": "MIT",
   "dependencies": {
     "colorette": "^2.0.20",
-    "semver": "^7.6.0"
+    "semver": "^7.6.2"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/node": "^20.12.7",
+    "@types/node": "^20.12.12",
     "@types/semver": "^7.5.8",
-    "rollup": "^4.16.4",
+    "rollup": "^4.17.2",
     "tslib": "^2.6.2",
     "typescript": "^5.4.5"
   },
