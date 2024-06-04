@@ -3,7 +3,7 @@ import { defineConfig } from "rollup";
 
 export default defineConfig({
     external: [
-        "colorette",
+        "node:util",
         "semver",
     ],
     input: "src/index.ts",

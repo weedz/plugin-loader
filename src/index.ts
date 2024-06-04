@@ -1,4 +1,4 @@
-import { cyan, green, red, yellow } from "colorette";
+import { styleText } from "node:util";
 import { SemVer, Range as SemVerRange, parse, satisfies } from "semver";
 
 export { NodeHandler } from "./Handlers/NodeHandler";
@@ -20,7 +20,7 @@ export type HandlerArgument<T extends PluginBase<API>, API = unknown> = {
     manifest: PluginManifest
     path: string
     api?: API
-    dependencies: {[key: string]: T}
+    dependencies: { [key: string]: T }
     previous?: any
 }
 
@@ -83,13 +83,13 @@ class Loader<T extends PluginBase<API>, API = unknown> {
             const loadedPlugin = this.plugins[pluginManifest.name];
 
             if (!loadedPlugin) {
-                this.options.log(`${cyan(pluginManifest.name)} [${pluginManifest.version.toString()}]`);
+                this.options.log(`${styleText("cyan", pluginManifest.name)} [${pluginManifest.version.toString()}]`);
                 await this.load(pluginManifest);
             } else {
-                this.options.log(`${cyan(pluginManifest.name)} [${pluginManifest.version.toString()}], loaded by ${loadedPlugin.dependent}`);
+                this.options.log(`${styleText("cyan", pluginManifest.name)} [${pluginManifest.version.toString()}], loaded by ${loadedPlugin.dependent} `);
             }
         }
-        this.options.log(`${green("Done!")}`);
+        this.options.log(`${styleText("green", "Done!")} `);
         return this.plugins;
     }
 
@@ -98,7 +98,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
             let dep = this.availablePlugins.get(dependency) || await this.loadDependency(dependency, optional);
             if (!dep) {
                 if (optional) {
-                    this.options.log(`${cyan(manifest.name)}: ${yellow(`Missing optional dependency '${dependency}'`)}`);
+                    this.options.log(`${styleText("cyan", manifest.name)}: ${styleText("yellow", `Missing optional dependency '${dependency}'`)} `);
                 } else {
                     throw `${manifest.name}: Dependency '${dependency}' not found]`;
                 }
@@ -107,10 +107,10 @@ class Loader<T extends PluginBase<API>, API = unknown> {
             if (!satisfies(dep.semver, dependencies[dependency])) {
                 this.availablePlugins.delete(dependency);
                 if (optional) {
-                    this.options.log(yellow(`Optional dependency not met for '${manifest.name}': expected ${dependency}@${dependencies[dependency]}, got ${dep.semver.toString()}`));
+                    this.options.log(styleText("yellow", `Optional dependency not met for '${manifest.name}': expected ${dependency} @${dependencies[dependency]}, got ${dep.semver.toString()} `));
                     continue;
                 } else {
-                    throw `${manifest.name}: Dependency not met for '${dependency}': expected ${dependencies[dependency]}, got ${dep.semver.toString()}`;
+                    throw `${manifest.name}: Dependency not met for '${dependency}': expected ${dependencies[dependency]}, got ${dep.semver.toString()} `;
                 }
             }
             if (dep.dependencies) {
@@ -127,7 +127,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
         }
     }
 
-    async loadDependency(dependency: string, optional = false) {
+    async loadDependency(dependency: string, _optional = false) {
         try {
             const dep = await this.getPluginManifest(dependency);
             this.availablePlugins.set(dependency, dep);
@@ -139,13 +139,13 @@ class Loader<T extends PluginBase<API>, API = unknown> {
 
     async getPluginManifest(pluginName: string) {
         const pluginsPath = this.options.path;
-        const manifest: PluginManifest = (await import(`${pluginsPath}/${pluginName}/plugin.json`, {
+        const manifest: PluginManifest = (await import(`${pluginsPath} /${pluginName}/plugin.json`, {
             assert: { type: 'json' }
         })).default;
         try {
             validateManifest(manifest);
         } catch (err) {
-            throw `Failed in plugin '${pluginName}': ${err}`;
+            throw `Failed in plugin '${pluginName}': ${err} `;
         }
         manifest.semver = new SemVer(manifest.version);
         if (!manifest.dependencies) {
@@ -158,8 +158,8 @@ class Loader<T extends PluginBase<API>, API = unknown> {
     }
 
     async load(plugin: PluginManifest, dependent: string[] = [], depth = 0) {
-        const dependencies: {[key: string]: T} = {};
-    
+        const dependencies: { [key: string]: T } = {};
+
         for (const depName in Object.assign({}, plugin.dependencies, plugin.optionalDependencies)) {
             if (!this.plugins[depName]) {
                 const dep = this.availablePlugins.get(depName);
@@ -168,7 +168,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
                     continue;
                 }
 
-                this.options.log(`${" ".repeat(depth + 1)}-> ${cyan(depName)} [${plugin.dependencies[depName]}]`);
+                this.options.log(`${" ".repeat(depth + 1)} -> ${styleText("cyan", depName)} [${plugin.dependencies[depName]}]`);
 
                 await this.load(dep, dependent.concat(plugin.name), depth + 1);
 
@@ -181,7 +181,7 @@ class Loader<T extends PluginBase<API>, API = unknown> {
         }
 
         let handler: (arg: HandlerArgument<T, API>) => Promise<T>;
-    
+
         if (Array.isArray(plugin.type)) {
             throw "'plugin.type' as Array not supported yet..";
         } else {
@@ -189,13 +189,13 @@ class Loader<T extends PluginBase<API>, API = unknown> {
                 ? this.options.handlers[plugin.type]
                 : this.options.handlers.default;
         }
-    
+
         const pluginObject: PluginObject<T> = {
             plugin: await handler({ manifest: plugin, path: this.options.path, api: this.options.api, dependencies }),
             manifest: plugin,
             dependent
         };
-    
+
         this.plugins[plugin.name] = pluginObject;
     }
 }
@@ -213,7 +213,7 @@ function validateManifest(manifest: PluginManifest) {
     }
 
     if (errors.length) {
-        throw red(`Invalid fields in manifest:\n${errors.join("\n")}`);
+        throw styleText("red", `Invalid fields in manifest: \n${errors.join("\n")} `);
     }
     return true;
 }
